@@ -1,11 +1,42 @@
 #include "shell.h"
 
 /**
- * hsh - Main shell loop
- * @info: The parameter & return info struct
- * @av: The arg vector from main()
+ * find_builtin - finds THE builtin command
+ * @info: THE parameter AND REeturn info struct
  *
- * Return: 0/1
+ * Return: -1 if builtin not found
+ */
+int find_builtin(info_t *info)
+{
+int i, built_in_ret = -1;
+builtin_table builtintbl[] = {
+{"exit", _myexit},
+{"env", _myenv},
+{"help", _myhelp},
+{"history", _myhistory},
+{"setenv", _mysetenv},
+{"unsetenv", _myunsetenv},
+{"cd", _mycd},
+{"alias", _myalias},
+{NULL, NULL}
+};
+
+for (i = 0; builtintbl[i].type; i++)
+if (_strcmp(info->argv[0], builtintbl[i].type) == 0)
+{
+info->line_count++;
+built_in_ret = builtintbl[i].func(info);
+break;
+}
+return (built_in_ret);
+}
+
+/**
+ * hsh - shell loop (MAIN)
+ * @info: The parameter AND return info struct
+ * @av: The argument vector
+ *
+ * Return: 0/0
  */
 int hsh(info_t *info, char **av)
 {
@@ -44,8 +75,8 @@ int hsh(info_t *info, char **av)
 }
 
 /**
- * find_cmd - Finds a command in PATH
- * @info: The parameter INFO
+ * find_cmd - a command in PATH
+ * @info: The return info struct
  *
  * Return: void
  */
@@ -86,8 +117,8 @@ void find_cmd(info_t *info)
 }
 
 /**
- * fork_cmd - Forks a an exec thread to run cmd
- * @info: The parameter INFO
+ * fork_cmd - forks a an exec thread to run cmd
+ * @info: The return info struct
  *
  * Return: void
  */
@@ -107,7 +138,10 @@ void fork_cmd(info_t *info)
 		{
 			free_info(info, 1);
 			if (errno == EACCES)
-				exit(126
+				exit(126);
+			exit(1);
+		}
+
 	}
 	else
 	{
@@ -119,35 +153,4 @@ void fork_cmd(info_t *info)
 				print_error(info, "Permission denied\n");
 		}
 	}
-}
-
-/**
- * find_builtin - Finds a builtin command
- * @info: The parameter
- *
- * Return: -1 if builtin
- */
-int find_builtin(info_t *info)
-{
-int i, built_in_ret = -1;
-builtin_table builtintbl[] = {
-{"exit", _myexit},
-{"env", _myenv},
-{"help", _myhelp},
-{"history", _myhistory},
-{"setenv", _mysetenv},
-{"unsetenv", _myunsetenv},
-{"cd", _mycd},
-{"alias", _myalias},
-{NULL, NULL}
-};
-
-for (i = 0; builtintbl[i].type; i++)
-if (_strcmp(info->argv[0], builtintbl[i].type) == 0)
-{
-info->line_count++;
-built_in_ret = builtintbl[i].func(info);
-break;
-}
-return (built_in_ret);
 }

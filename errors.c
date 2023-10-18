@@ -88,17 +88,3 @@ count += _putfd(*str++, fd);
 return (count);
 }
 
-
-int display_error_character(char c);
-
-/**
- * display_error_character - displays an error character
- * @c: the character to be displayed
- *
- * Return: Always 1
- */
-int display_error_character(char c)
-{
-
-return (1);
-}
